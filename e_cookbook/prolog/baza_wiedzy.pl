@@ -106,7 +106,7 @@ odpowiednia_trudnosc(trudny, trudny).
 
 % Główna reguła wyszukiwania przepisów
 moze_gotowac(przepis(Nazwa, Typ, Dieta, Kuchnia, Czas, Trudnosc, Smak, Kalorie, Skladniki),
-             DostepneSkladniki, WymaganadiDeta, WymaganyPoziom) :-
+             DostepneSkladniki, WymaganaDieta, WymaganyPoziom) :-
     przepis(Nazwa, Typ, Dieta, Kuchnia, Czas, Trudnosc, Smak, Kalorie, Skladniki),
     ma_skladniki(Skladniki, DostepneSkladniki),
     zgodna_dieta(Dieta, WymaganaDieta),
@@ -127,4 +127,15 @@ alternatywny_skladnik(sos_sojowy, tamari).  % bezglutenowy odpowiednik
 % Sprawdzanie czy składnik może być zastąpiony
 mozna_zastapic(Skladnik, Zamiennik) :-
     alternatywny_skladnik(Skladnik, Zamiennik);
-    alternatywny_skladnik(Zamiennik, Skladnik). 
+    alternatywny_skladnik(Zamiennik, Skladnik).
+
+% Reguły sprawdzania składników
+ma_wszystkie_skladniki([], _).
+ma_wszystkie_skladniki([H|T], DostepneSkladniki) :-
+    member(H, DostepneSkladniki),
+    ma_wszystkie_skladniki(T, DostepneSkladniki).
+
+% Główna reguła wyszukiwania przepisów
+znajdz_przepis(Nazwa, Typ, Dieta, Kuchnia, Czas, Trudnosc, Smak, Kalorie, Skladniki, DostepneSkladniki) :-
+    przepis(Nazwa, Typ, Dieta, Kuchnia, Czas, Trudnosc, Smak, Kalorie, Skladniki),
+    ma_wszystkie_skladniki(Skladniki, DostepneSkladniki). 
