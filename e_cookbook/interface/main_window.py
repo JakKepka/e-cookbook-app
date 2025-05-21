@@ -3,16 +3,15 @@ from PyQt5.QtWidgets import (QMainWindow, QWidget, QVBoxLayout, QHBoxLayout,
                              QPushButton, QSlider, QCheckBox, QScrollArea,
                              QGroupBox, QSpinBox)
 from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QFont
 from ..logic.prolog_connector import PrologConnector
-from ..logic.recipe_optimizer import RecipeOptimizer
 
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("E-Cookbook - Asystent Kuchenny")
-        self.setMinimumSize(800, 600)
+        self.setMinimumSize(1000, 800)
         self.prolog_connector = PrologConnector()
-        self.recipe_optimizer = RecipeOptimizer(self.prolog_connector.fuzzy_reasoning)
         self.setup_ui()
         self.apply_styles()
 
@@ -31,15 +30,23 @@ class MainWindow(QMainWindow):
                 color: #333333;
                 font-size: 14px;
                 padding: 5px;
+                min-height: 20px;
             }
-            QTextEdit, QComboBox {
+            QTextEdit, QComboBox, QLineEdit {
                 background-color: white;
                 color: #333333;
                 border: 1px solid #cccccc;
                 border-radius: 4px;
-                padding: 5px;
+                padding: 8px;
+                min-height: 25px;
             }
-            QTextEdit:focus, QComboBox:focus {
+            QGroupBox {
+                font-size: 14px;
+                font-weight: bold;
+                padding: 15px;
+                margin-top: 10px;
+            }
+            QTextEdit:focus, QComboBox:focus, QLineEdit:focus {
                 border: 1px solid #66afe9;
             }
             QPushButton {
@@ -47,8 +54,9 @@ class MainWindow(QMainWindow):
                 color: white;
                 border: none;
                 border-radius: 4px;
-                padding: 8px 16px;
+                padding: 10px 20px;
                 font-size: 14px;
+                min-height: 40px;
             }
             QPushButton:hover {
                 background-color: #45a049;
@@ -58,83 +66,71 @@ class MainWindow(QMainWindow):
             }
             QSlider::groove:horizontal {
                 border: 1px solid #cccccc;
-                height: 8px;
+                height: 10px;
                 background: white;
                 margin: 2px 0;
-                border-radius: 4px;
+                border-radius: 5px;
             }
             QSlider::handle:horizontal {
                 background: #4CAF50;
                 border: 1px solid #4CAF50;
-                width: 18px;
+                width: 20px;
                 margin: -2px 0;
-                border-radius: 9px;
+                border-radius: 10px;
             }
             QSlider::handle:horizontal:hover {
                 background: #45a049;
             }
             QComboBox {
                 padding: 5px;
+                min-width: 200px;  # Zwiększona szerokość comboboxów
+            }
+            QLineEdit {
+                min-width: 300px;  # Zwiększona szerokość pól tekstowych
+            }
+            QSpinBox {
                 min-width: 100px;
-            }
-            QComboBox::drop-down {
-                border: none;
-            }
-            QComboBox::down-arrow {
-                image: none;
-                border-left: 5px solid transparent;
-                border-right: 5px solid transparent;
-                border-top: 5px solid #333333;
-                width: 0;
-                height: 0;
-                margin-right: 5px;
-            }
-            QComboBox:on {
-                border: 1px solid #66afe9;
-            }
-            QComboBox QAbstractItemView {
-                background-color: white;
-                color: #333333;
-                selection-background-color: #4CAF50;
-                selection-color: white;
+                padding: 5px;
             }
         """)
 
     def setup_ui(self):
+        # Tworzymy scroll area dla całego interfejsu
+        scroll = QScrollArea()
+        scroll.setWidgetResizable(True)
+        self.setCentralWidget(scroll)
+
+        # Główny widget i layout
         central_widget = QWidget()
-        self.setCentralWidget(central_widget)
+        scroll.setWidget(central_widget)
         layout = QVBoxLayout(central_widget)
-        layout.setSpacing(15)
-        layout.setContentsMargins(20, 20, 20, 20)
+        layout.setSpacing(20)  # Zwiększony odstęp między elementami
+        layout.setContentsMargins(25, 25, 25, 25)  # Zwiększone marginesy
 
         # Ingredients section
         ingredients_group = QGroupBox("Dostępne składniki")
         ingredients_layout = QVBoxLayout(ingredients_group)
+        ingredients_layout.setSpacing(10)
         self.ingredients_input = QTextEdit()
         self.ingredients_input.setPlaceholderText("Wpisz dostępne składniki (po przecinku)")
-        self.ingredients_input.setMinimumHeight(80)
+        self.ingredients_input.setMinimumHeight(100)  # Zwiększona wysokość
         ingredients_layout.addWidget(self.ingredients_input)
         layout.addWidget(ingredients_group)
-
-        # Equipment section
-        equipment_group = QGroupBox("Dostępny sprzęt")
-        equipment_layout = QVBoxLayout(equipment_group)
-        self.equipment_input = QTextEdit()
-        self.equipment_input.setPlaceholderText("Wpisz dostępny sprzęt kuchenny (po przecinku)")
-        self.equipment_input.setMinimumHeight(60)
-        equipment_layout.addWidget(self.equipment_input)
-        layout.addWidget(equipment_group)
 
         # Preferences section
         preferences_group = QGroupBox("Preferencje")
         preferences_layout = QVBoxLayout(preferences_group)
+        preferences_layout.setSpacing(15)  # Zwiększony odstęp w sekcji preferencji
         
         # Diet and allergies in one row
         diet_allergies_layout = QHBoxLayout()
+        diet_allergies_layout.setSpacing(20)  # Zwiększony odstęp między elementami
         
         # Diet type
         diet_layout = QVBoxLayout()
-        diet_layout.addWidget(QLabel("Typ diety:"))
+        diet_label = QLabel("Typ diety:")
+        diet_label.setFont(QFont('Arial', 12))  # Większa czcionka dla etykiet
+        diet_layout.addWidget(diet_label)
         self.diet_combo = QComboBox()
         self.diet_combo.addItems(["Wszystkie", "Wegańska", "Wegetariańska", "Bezglutenowa"])
         diet_layout.addWidget(self.diet_combo)
@@ -142,7 +138,9 @@ class MainWindow(QMainWindow):
 
         # Allergies
         allergies_layout = QVBoxLayout()
-        allergies_layout.addWidget(QLabel("Alergie:"))
+        allergies_label = QLabel("Alergie:")
+        allergies_label.setFont(QFont('Arial', 12))
+        allergies_layout.addWidget(allergies_label)
         self.allergies_input = QLineEdit()
         self.allergies_input.setPlaceholderText("np. orzechy, mleko (po przecinku)")
         allergies_layout.addWidget(self.allergies_input)
@@ -150,41 +148,51 @@ class MainWindow(QMainWindow):
         
         preferences_layout.addLayout(diet_allergies_layout)
 
-        # Taste preferences
+        # Taste preferences with more space
         taste_layout = QVBoxLayout()
         taste_label = QLabel("Preferencje smakowe:")
+        taste_label.setFont(QFont('Arial', 12))
         taste_layout.addWidget(taste_label)
         
-        # Sweetness and spiciness in one row
         sliders_layout = QHBoxLayout()
+        sliders_layout.setSpacing(30)  # Większy odstęp między suwakami
         
         # Sweetness slider
         sweet_layout = QVBoxLayout()
-        sweet_layout.addWidget(QLabel("Słodkość:"))
+        sweet_label = QLabel("Słodkość:")
+        sweet_label.setFont(QFont('Arial', 11))
+        sweet_layout.addWidget(sweet_label)
         self.sweet_slider = QSlider(Qt.Horizontal)
         self.sweet_slider.setMinimum(0)
         self.sweet_slider.setMaximum(10)
+        self.sweet_slider.setMinimumWidth(200)  # Szerszy suwak
         sweet_layout.addWidget(self.sweet_slider)
         sliders_layout.addLayout(sweet_layout)
 
         # Spiciness slider
         spicy_layout = QVBoxLayout()
-        spicy_layout.addWidget(QLabel("Ostrość:"))
+        spicy_label = QLabel("Ostrość:")
+        spicy_label.setFont(QFont('Arial', 11))
+        spicy_layout.addWidget(spicy_label)
         self.spicy_slider = QSlider(Qt.Horizontal)
         self.spicy_slider.setMinimum(0)
         self.spicy_slider.setMaximum(10)
+        self.spicy_slider.setMinimumWidth(200)  # Szerszy suwak
         spicy_layout.addWidget(self.spicy_slider)
         sliders_layout.addLayout(spicy_layout)
         
         taste_layout.addLayout(sliders_layout)
         preferences_layout.addLayout(taste_layout)
 
-        # Time and calories limits
+        # Time and calories limits with more space
         limits_layout = QHBoxLayout()
+        limits_layout.setSpacing(30)
         
         # Max time
         time_layout = QVBoxLayout()
-        time_layout.addWidget(QLabel("Maksymalny czas (min):"))
+        time_label = QLabel("Maksymalny czas (min):")
+        time_label.setFont(QFont('Arial', 11))
+        time_layout.addWidget(time_label)
         self.max_time_spin = QSpinBox()
         self.max_time_spin.setRange(0, 180)
         self.max_time_spin.setValue(60)
@@ -193,7 +201,9 @@ class MainWindow(QMainWindow):
 
         # Max calories
         calories_layout = QVBoxLayout()
-        calories_layout.addWidget(QLabel("Maksymalne kalorie:"))
+        calories_label = QLabel("Maksymalne kalorie:")
+        calories_label.setFont(QFont('Arial', 11))
+        calories_layout.addWidget(calories_label)
         self.max_calories_spin = QSpinBox()
         self.max_calories_spin.setRange(0, 2000)
         self.max_calories_spin.setValue(800)
@@ -202,12 +212,15 @@ class MainWindow(QMainWindow):
         
         preferences_layout.addLayout(limits_layout)
 
-        # Occasion and Difficulty in one row
+        # Occasion and Difficulty with more space
         options_layout = QHBoxLayout()
+        options_layout.setSpacing(30)
         
         # Occasion
         occasion_layout = QVBoxLayout()
-        occasion_layout.addWidget(QLabel("Typ potrawy:"))
+        occasion_label = QLabel("Typ potrawy:")
+        occasion_label.setFont(QFont('Arial', 11))
+        occasion_layout.addWidget(occasion_label)
         self.occasion_combo = QComboBox()
         self.occasion_combo.addItems(["glowne", "przystawka", "zupa", "deser"])
         occasion_layout.addWidget(self.occasion_combo)
@@ -215,7 +228,9 @@ class MainWindow(QMainWindow):
 
         # Difficulty
         difficulty_layout = QVBoxLayout()
-        difficulty_layout.addWidget(QLabel("Poziom trudności:"))
+        difficulty_label = QLabel("Poziom trudności:")
+        difficulty_label.setFont(QFont('Arial', 11))
+        difficulty_layout.addWidget(difficulty_label)
         self.difficulty_combo = QComboBox()
         self.difficulty_combo.addItems(["latwy", "sredni", "trudny"])
         difficulty_layout.addWidget(self.difficulty_combo)
@@ -226,7 +241,8 @@ class MainWindow(QMainWindow):
 
         # Search button
         self.search_button = QPushButton("Znajdź i zoptymalizuj przepisy")
-        self.search_button.setMinimumHeight(40)
+        self.search_button.setMinimumHeight(50)  # Wyższy przycisk
+        self.search_button.setFont(QFont('Arial', 12, QFont.Bold))  # Pogrubiona czcionka przycisku
         self.search_button.clicked.connect(self.search_recipes)
         layout.addWidget(self.search_button)
 
@@ -235,13 +251,12 @@ class MainWindow(QMainWindow):
         results_layout = QVBoxLayout(results_group)
         self.results_area = QTextEdit()
         self.results_area.setReadOnly(True)
-        self.results_area.setMinimumHeight(200)
+        self.results_area.setMinimumHeight(250)  # Zwiększona wysokość obszaru wyników
         results_layout.addWidget(self.results_area)
         layout.addWidget(results_group)
 
     def search_recipes(self):
         ingredients = self.ingredients_input.toPlainText()
-        equipment = self.equipment_input.toPlainText()
         diet = self.diet_combo.currentText()
         allergies = [a.strip() for a in self.allergies_input.text().split(',') if a.strip()]
         sweetness = self.sweet_slider.value()
@@ -251,7 +266,7 @@ class MainWindow(QMainWindow):
         max_time = self.max_time_spin.value()
         max_calories = self.max_calories_spin.value()
 
-        # Get matching recipes
+        # Get matching recipes using Prolog
         recipes = self.prolog_connector.find_recipes(
             ingredients, diet, sweetness, spiciness, occasion, difficulty
         )
@@ -267,41 +282,21 @@ class MainWindow(QMainWindow):
 
         result_text = "Znalezione przepisy:\n\n"
         for recipe in recipes:
-            # Optymalizuj przepis
-            available_ingredients = [i.strip().lower().replace(' ', '_') 
-                                  for i in ingredients.split(',') if i.strip()]
-            available_equipment = [e.strip().lower().replace(' ', '_') 
-                                for e in equipment.split(',') if e.strip()]
-            
-            optimized = self.recipe_optimizer.optimize_recipe(
-                recipe, available_ingredients, available_equipment,
-                max_time, max_calories, allergies
-            )
-
-            result_text += f"🍳 {optimized.nazwa}\n"
+            result_text += f"🍳 {recipe['nazwa']}\n"
             result_text += f"   Kuchnia: {recipe['kuchnia']}\n"
-            result_text += f"   Czas przygotowania: {optimized.czas_przygotowania} minut\n"
-            result_text += f"   Kalorie: {optimized.kalorie} kcal\n"
-            result_text += f"   Profil smakowy: {recipe['smak']}\n"
-            result_text += f"   Szacowany koszt: {optimized.koszt_bazowy:.2f} zł\n\n"
+            result_text += f"   Czas przygotowania: {recipe['czas']} minut\n"
+            result_text += f"   Kalorie: {recipe['kalorie']} kcal\n"
+            result_text += f"   Profil smakowy: {recipe['smak']}\n\n"
             
-            result_text += "   📋 Składniki podstawowe:\n"
-            result_text += "   " + ", ".join(optimized.skladniki_podstawowe) + "\n\n"
+            result_text += "   📋 Składniki:\n"
+            result_text += "   " + ", ".join(recipe['skladniki']) + "\n\n"
             
-            if optimized.skladniki_opcjonalne:
-                result_text += "   ✨ Składniki opcjonalne:\n"
-                result_text += "   " + ", ".join(optimized.skladniki_opcjonalne) + "\n\n"
-            
-            if optimized.zamienniki:
+            if recipe['zamienniki']:
                 result_text += "   🔄 Sugerowane zamienniki:\n"
-                for ingredient, substitute in optimized.zamienniki.items():
+                for ingredient, substitute in recipe['zamienniki'].items():
                     result_text += f"      • Zamiast {ingredient} użyj: {substitute['proporcje']}\n"
-                    result_text += f"        (Podobieństwo: {substitute['podobieństwo'] * 100}%)\n"
+                    result_text += f"        (Podobieństwo: {substitute['podobieństwo'] * 100:.0f}%)\n"
             
-            if optimized.wymagany_sprzet:
-                result_text += "\n   🔧 Wymagany sprzęt:\n"
-                result_text += "   " + ", ".join(optimized.wymagany_sprzet) + "\n"
-
             result_text += "\n-------------------\n\n"
 
         self.results_area.setText(result_text) 
