@@ -1,10 +1,23 @@
-import type { Metadata } from 'next';
 import './globals.css';
-import Navbar from '@/components/Navbar';
+import { Inter, Playfair_Display } from 'next/font/google';
+import Header from './components/Header';
+import Footer from './components/Footer';
 
-export const metadata: Metadata = {
-  title: 'E-Cookbook - Twój Inteligentny Asystent Kulinarny',
-  description: 'Odkryj nowe przepisy i otrzymuj spersonalizowane rekomendacje kulinarne',
+const inter = Inter({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-inter',
+});
+
+const playfair = Playfair_Display({
+  subsets: ['latin'],
+  display: 'swap',
+  variable: '--font-playfair',
+});
+
+export const metadata = {
+  title: 'E-Cookbook - Twoja książka kucharska online',
+  description: 'Odkryj, zapisuj i dziel się przepisami kulinarnymi. Znajdź inspirację na kolejny posiłek!',
 };
 
 export default function RootLayout({
@@ -13,19 +26,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="pl" className="h-full">
-      <body className="h-full bg-custom-light">
-        <Navbar />
-        <main className="min-h-[calc(100vh-4rem)] py-8">
-          {children}
-        </main>
-        <footer className="bg-custom-dark text-custom-light">
-          <div className="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-            <p className="text-center text-sm">
-              © {new Date().getFullYear()} E-Cookbook. Wszystkie prawa zastrzeżone.
-            </p>
-          </div>
-        </footer>
+    <html lang="pl" className={`${inter.variable} ${playfair.variable}`}>
+      <body className="min-h-screen flex flex-col bg-cookbook-light/5">
+        <Header />
+        <main className="flex-grow">{children}</main>
+        <Footer />
       </body>
     </html>
   );

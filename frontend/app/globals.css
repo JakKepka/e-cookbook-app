@@ -1,3 +1,54 @@
 @tailwind base;
 @tailwind components;
-@tailwind utilities; 
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --font-sans: var(--font-inter);
+    --font-serif: var(--font-playfair);
+  }
+
+  html {
+    font-family: var(--font-sans);
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-serif);
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply px-4 py-2 bg-cookbook-orange text-white rounded-md hover:bg-cookbook-red transition-colors;
+  }
+
+  .btn-secondary {
+    @apply px-4 py-2 bg-cookbook-beige text-cookbook-navy rounded-md hover:bg-cookbook-light transition-colors;
+  }
+
+  .input-primary {
+    @apply w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-cookbook-orange focus:border-transparent;
+  }
+
+  .card {
+    @apply bg-white rounded-lg shadow-md p-4;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: theme('colors.cookbook.light');
+}
+
+::-webkit-scrollbar-thumb {
+  background: theme('colors.cookbook.orange');
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: theme('colors.cookbook.red');
+} 
