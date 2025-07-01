@@ -1,3 +1,4 @@
+
 # E-Cookbook - Ekspercki Asystent Kuchenny
 
 Aplikacja desktopowa działająca jako system ekspercki do wyszukiwania przepisów kulinarnych na podstawie dostępnych składników i preferencji użytkownika.
